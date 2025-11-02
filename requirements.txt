@@ -1,4 +1,2 @@
 streamlit==1.38.0
 validators==0.20.0
-
-# Optional: add any other libs you plan to use

@@ -6,6 +6,7 @@ from utils.youtube_utils import (
     normalize_url
 )
 from utils.ui_utils import set_page_style, render_footer
+
 st.set_page_config(page_title="SafeView – Clean YouTube Player", page_icon="🎬", layout="centered")
 
 set_page_style()
