@@ -1,7 +1,11 @@
 import streamlit as st
-from utils.youtube_utils import validate_youtube_url, extract_video_id, generate_embed_url, normalize_url
+from utils.youtube_utils import (
+    validate_youtube_url,
+    extract_video_id,
+    generate_embed_url,
+    normalize_url
+)
 from utils.ui_utils import set_page_style, render_footer
-
 st.set_page_config(page_title="SafeView – Clean YouTube Player", page_icon="🎬", layout="centered")
 
 set_page_style()
