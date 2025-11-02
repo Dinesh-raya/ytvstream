@@ -1,51 +1,42 @@
-import re
 import streamlit as st
+from utils.youtube_utils import validate_youtube_url, extract_video_id, generate_embed_url, normalize_url
+from utils.ui_utils import set_page_style, render_footer
 
-st.set_page_config(
-    page_title="SafeView for YouTube",
-    page_icon="🎬",
-    layout="centered"
-)
+st.set_page_config(page_title="SafeView – Clean YouTube Player", page_icon="🎬", layout="centered")
 
-st.title("🎬 SafeView for YouTube")
-st.write("Watch YouTube videos without ads, comments, or distractions.")
+set_page_style()
 
-def extract_youtube_id(url: str) -> str:
-    patterns = [
-        r"(?:https?://)?(?:www\.)?youtu\.be/([a-zA-Z0-9_-]{11})",
-        r"(?:https?://)?(?:www\.)?youtube\.com/watch\?v=([a-zA-Z0-9_-]{11})",
-        r"(?:https?://)?(?:www\.)?youtube\.com/embed/([a-zA-Z0-9_-]{11})"
-    ]
-    for pattern in patterns:
-        match = re.match(pattern, url)
-        if match:
-            return match.group(1)
-    return None
+st.title("🎬 SafeView – YouTube Distraction‑Free Player")
+st.caption("Paste a YouTube link below and watch without ads, comments, or clutter.")
 
-youtube_url = st.text_input("Paste your YouTube video link here 👇")
+url = st.text_input("Enter YouTube URL:", placeholder="e.g., https://www.youtube.com/watch?v=dQw4w9WgXcQ")
 
-if youtube_url:
-    video_id = extract_youtube_id(youtube_url)
-
-    if video_id:
-        st.success("✅ Valid YouTube link detected!")
-        safe_embed_url = f"https://www.youtube-nocookie.com/embed/{video_id}"
-
-        st.markdown(
-            f"""
-            <div style="display:flex; justify-content:center; margin-top:20px;">
-                <iframe width="700" height="400"
-                        src="{safe_embed_url}"
-                        title="YouTube video player"
-                        frameborder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowfullscreen>
-                </iframe>
-            </div>
-            """ ,
-            unsafe_allow_html=True
-        )
+if url:
+    url = url.strip()
+    url = normalize_url(url)
+    if validate_youtube_url(url):
+        video_id = extract_video_id(url)
+        if video_id:
+            embed_url = generate_embed_url(video_id)
+            st.markdown(
+                f"""
+                <div style="display:flex; justify-content:center;">
+                  <iframe width="100%" style="max-width:960px; height:480px; border-radius:12px;"
+                      src="{embed_url}"
+                      frameborder="0"
+                      allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                      allowfullscreen loading="lazy">
+                  </iframe>
+                </div>
+                """ ,
+                unsafe_allow_html=True
+            )
+            st.success("✅ Video loaded. If the video is age‑restricted or private, YouTube may request sign‑in.")
+        else:
+            st.error("❌ Could not extract a Video ID from that URL. Try a different YouTube link.")
     else:
-        st.error("❌ Please enter a valid YouTube video URL.")
+        st.error("⚠️ That doesn't look like a valid YouTube URL. Please paste a standard YouTube video link.")
 else:
-    st.info("👆 Paste a YouTube video link above to view it safely.")
+    st.info("👆 Paste a valid YouTube link above to begin.")
+
+render_footer()
